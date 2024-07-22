@@ -9,17 +9,118 @@
 #include<string.h>
 #include<conio.h>
 #include"header.h"
+
 #define MAX_INPUT 100
+#define MAX_CONTACTS 100
 
+struct ContactRecord {
+	char name[20];
+	char phone[12];
+	char address[50];
+	char postcode[8];
+	char email[20];
+};
 
-struct record							// ¶¨ÒåÒ»¸öÃûÎªrecordµÄ½á¹¹ÌåÀàĞÍ£¬ÓÃÀ´´æ´¢Ñ§ÉúµÄĞÅÏ¢
-{
-	char name[20];						// ĞÕÃû£¬×î¶à20¸ö×Ö·û
-	char phone[12];						// µç»°£¬×î¶à12¸ö×Ö·û
-	char adress[50];					// µØÖ·£¬×î¶à50¸ö×Ö·û
-	char postcode[8];					// ÓÊ±à£¬×î¶à8¸ö×Ö·û
-	char e_mail[20];					// µç×ÓÓÊÏä£¬×î¶à20¸ö×Ö·û
-}student[100];							// ¶¨ÒåÒ»¸ö½á¹¹ÌåÊı×é£¬ÓÃÀ´´æ´¢¶à¸öÑ§ÉúµÄĞÅÏ¢£¬Êı×é´óĞ¡Îª100£¬¼´×î¶à´æ´¢100¸öÑ§ÉúµÄĞÅÏ¢
+/*
+º¯ÊıÃû:showDeleteRecordInterface
+¹¦ÄÜ:ÏÔÊ¾É¾³ı½çÃæ
+Íê³ÉÕß:ÀÏºú
+
+*/
+void showDeleteRecordInterface(struct ContactRecord contacts[], int num_contacts) {
+
+	system("cls");
+	printf("\t\t************* ÇëÊäÈë²éÕÒ·½Ê½ ***********\n\n");
+	printf("\t\t\t1.ĞÕÃû²éÕÒ\n");
+	printf("\t\t\t2.µç»°²éÕÒ\n");
+	printf("\t\t\t3.µØÖ·²éÕÒ\n");
+	printf("\t\t\t4.ÓÊ±à²éÕÒ\n");
+	printf("\t\t\t5.ÓÊÏä²éÕÒ\n");
+	printf("\t\t\t6.Ä£ºı²éÕÒ\n");
+	printf("\t\t\t7.·Ö×é²éÕÒ\n");
+	printf("\t\t\t8.ÍË³ö\n");
+	char s[80];
+	int a;
+	do {
+		printf("Enter you choice(0~8):");
+		scanf("%s", s);												// »ñÈ¡ÓÃ»§ÊäÈëµÄ×Ö·û´®£¬²¢´æ´¢µ½×Ö·ûÊı×ésÖĞ
+		a = atoi(s);
+		if (a == 8) return;
+	} while (a < 1 || a>8);
+	system("cls");
+	printf("\t\tÊäÈëÉ¾³ıÁªÏµÈËĞÅÏ¢:\n\n");
+	char key[80];
+	scanf("%s", &key);
+	int res = deleteContact(contacts, num_contacts, key, a);
+	if (res == 0) {
+		printf("\t\tÉ¾³ı³É¹¦\n");
+		num_contacts--;
+	}
+	else printf("\t\tÉ¾³ıÊ§°Ü\n");
+	char op;
+	printf("\t\tÊÇ·ñ¼ÌĞøÉ¾³ı?\n");
+	printf("\t\t\ty/n?\n");
+	scanf("%c", &op);
+	if (op == 'y' || op == 'Y') showDeleteRecordInterface(contacts, num_contacts);
+	else return;
+}
+
+/*
+º¯ÊıÃû:showSearchInterface
+¹¦ÄÜ:ÏÔÊ¾²éÕÒ½çÃæ
+Íê³ÉÕß:ÀÏºú
+
+*/
+void showSearchInterface(struct ContactRecord contacts[], int num_contacts) {
+	system("cls");
+	printf("\t\t************* ÇëÊäÈë²éÕÒ·½Ê½ ***********\n\n");
+	printf("\t\t\t1.ĞÕÃû²éÕÒ\n");
+	printf("\t\t\t2.µç»°²éÕÒ\n");
+	printf("\t\t\t3.µØÖ·²éÕÒ\n");
+	printf("\t\t\t4.ÓÊ±à²éÕÒ\n");
+	printf("\t\t\t5.ÓÊÏä²éÕÒ\n");
+	printf("\t\t\t6.Ä£ºı²éÕÒ\n");
+	printf("\t\t\t7.·Ö×é²éÕÒ\n");
+	printf("\t\t\t8.ÍË³ö\n");
+	char s[80];
+	int a;
+	do {
+		printf("Enter you choice(0~8):");
+		scanf("%s", s);												// »ñÈ¡ÓÃ»§ÊäÈëµÄ×Ö·û´®£¬²¢´æ´¢µ½×Ö·ûÊı×ésÖĞ
+		a = atoi(s);
+	} while (a < 1 || a>8);
+	system("cls");
+	char key[80];
+	printf("\t\tÊäÈë²éÕÒÁªÏµÈËĞÅÏ¢:\n");
+	scanf("%s", &key);
+	int res = -1;
+	switch (a) {
+	case 1:
+		res = searchContactByName(contacts, num_contacts, key);
+	case 2:
+		res = searchContactByPhone(contacts, num_contacts, key);
+	case 3:
+		res = searchContactByAddress(contacts, num_contacts, key);
+	case 4:
+		res = searchContactByPostcode(contacts, num_contacts, key);
+	case 5:
+		res = searchContactByEmail(contacts, num_contacts, key);
+	case 6:
+		res = fuzzySearchContacts(contacts, num_contacts, key);
+	case 7:
+		res = searchContactsByGroup(contacts, num_contacts, key);
+	case 8:
+		return;
+
+	}
+	if (res == 0) printf("\t\t²éÕÒ³É¹¦\n");
+	else printf("\t\t²éÕÒÊ§°Ü\n");
+	printf("\t\tÊÇ·ñ¼ÌĞø½øĞĞ²éÕÒ?\ny/n\n");
+	char op;
+	scanf("%c", &op);
+	if (op == 'y' || op == 'Y') showSearchInterface(contacts, num_contacts);
+	else return;
+}
 
 
 void encrypt(char* pwd)					//ÕâÊÇÒ»¸öÃûÎªencryptµÄº¯Êı£¬ÓÃÓÚ¶Ô´«ÈëµÄ×Ö·û´®½øĞĞ¼òµ¥µÄ¼ÓÃÜ´¦Àí
@@ -64,7 +165,7 @@ int menu_select()													// ¶¨ÒåÒ»¸öÃûÎªmenu_selectµÄº¯Êı£¬ÓÃÀ´ÏÔÊ¾²Ëµ¥²¢»ñ
 }
 
 
-int adduser()														// ¶¨ÒåÒ»¸öÃûÎªadduserµÄº¯Êı£¬ÓÃÀ´Ìí¼ÓÑ§ÉúĞÅÏ¢
+int addContacts()														// ¶¨ÒåÒ»¸öÃûÎªadduserµÄº¯Êı£¬ÓÃÀ´Ìí¼ÓÑ§ÉúĞÅÏ¢
 {
 	printf("\n\t\t\t**************** ÇëÊäÈëÓÃ»§ĞÅÏ¢ ****************\n");
 	printf("\t\t\tÊäÈëĞÕÃû:");
@@ -72,20 +173,20 @@ int adduser()														// ¶¨ÒåÒ»¸öÃûÎªadduserµÄº¯Êı£¬ÓÃÀ´Ìí¼ÓÑ§ÉúĞÅÏ¢
 	printf("\n\t\t\tÊäÈëµç»°ºÅÂë:");
 	scanf("%s", student[num].phone);								// »ñÈ¡ÓÃ»§ÊäÈëµÄµç»°ºÅÂë£¬²¢´æ´¢µ½½á¹¹ÌåÊı×éÖĞ
 	printf("\n\t\t\tÊäÈëµØÖ·:");
-	scanf("%s", student[num].adress);								// »ñÈ¡ÓÃ»§ÊäÈëµÄµØÖ·£¬²¢´æ´¢µ½½á¹¹ÌåÊı×éÖĞ
+	scanf("%s", student[num].address);								// »ñÈ¡ÓÃ»§ÊäÈëµÄµØÖ·£¬²¢´æ´¢µ½½á¹¹ÌåÊı×éÖĞ
 	printf("\n\t\t\tÊäÈëÓÊ±à:");
 	scanf("%s", student[num].postcode);								//»ñÈ¡ÓÃ»§ÊäÈëµÄÓÊ±à£¬²¢´æ´¢µ½½á¹¹ÌåÊı×éÖĞ
 	printf("\n\t\t\tÊäÈëe-mail:");
-	scanf("%s", student[num].e_mail);								// »ñÈ¡ÓÃ»§ÊäÈëµÄµç×ÓÓÊ¼şµØÖ·£¬²¢´æ´¢µ½½á¹¹ÌåÊı×éÖĞ
+	scanf("%s", student[num].email);								// »ñÈ¡ÓÃ»§ÊäÈëµÄµç×ÓÓÊ¼şµØÖ·£¬²¢´æ´¢µ½½á¹¹ÌåÊı×éÖĞ
 	num++;															// Ñ§ÉúĞÅÏ¢ÊıÁ¿¼Ó1
 	printf("\n\t\t\tÊÇ·ñ¼ÌĞøÌí¼Ó?(Y/N):");							// ÌáÊ¾ÓÃ»§ÊÇ·ñ¼ÌĞøÌí¼Ó
 	if (_getch() == 'y' || _getch() == 'Y')							// Èç¹ûÓÃ»§ÊäÈëµÄÊÇ¡¯y¡¯»ò¡¯Y¡¯£¬Ôòµİ¹éµ÷ÓÃadduserº¯ÊıÌí¼ÓÑ§ÉúĞÅÏ¢
-		adduser();
+		addContacts();
 	return(0);														// ·µ»Ø0,½áÊøº¯Êı
 }
 
 
-void list()											// ¶¨ÒåÒ»¸öÃûÎªlistµÄº¯Êı£¬ÓÃÀ´ÏÔÊ¾ËùÓĞÑ§ÉúĞÅÏ¢
+void listContacts()											// ¶¨ÒåÒ»¸öÃûÎªlistµÄº¯Êı£¬ÓÃÀ´ÏÔÊ¾ËùÓĞÑ§ÉúĞÅÏ¢
 {
 	int i;
 	system("cls");									// ÇåÆÁ£¬Çå³ı¿ØÖÆÌ¨ÖĞÖ®Ç°µÄÄÚÈİ
@@ -96,9 +197,9 @@ void list()											// ¶¨ÒåÒ»¸öÃûÎªlistµÄº¯Êı£¬ÓÃÀ´ÏÔÊ¾ËùÓĞÑ§ÉúĞÅÏ¢
 		{
 			printf("\t\t\tĞÕÃû:%s\n", student[i].name);
 			printf("\t\t\tµç»°:%s\n", student[i].phone);
-			printf("\t\t\tµØÖ·:%s\n", student[i].adress);
+			printf("\t\t\tµØÖ·:%s\n", student[i].address);
 			printf("\t\t\tÓÊ±à:%s\n", student[i].postcode);
-			printf("\t\t\tEmail:%s\n", student[i].e_mail);
+			printf("\t\t\tEmail:%s\n", student[i].email);
 			if (i + 1 < num)						// Èç¹û²»ÊÇ×îºóÒ»¸öÑ§ÉúĞÅÏ¢£¬ÌáÊ¾ÓÃ»§°´ÈÎÒâ¼ü¼ÌĞø
 			{
 				system("pause");					// ½«¿ØÖÆÌ¨ÔİÍ££¬µÈ´ıÓÃ»§°´ÈÎÒâ¼ü¼ÌĞø
@@ -114,7 +215,7 @@ void list()											// ¶¨ÒåÒ»¸öÃûÎªlistµÄº¯Êı£¬ÓÃÀ´ÏÔÊ¾ËùÓĞÑ§ÉúĞÅÏ¢
 }
 
 
-int searchbyname()											// ¶¨ÒåÒ»¸öÃûÎªsearchbynameµÄº¯Êı£¬ÓÃÀ´°´ĞÕÃû²éÕÒÑ§ÉúĞÅÏ¢
+int searchContactByName()											// ¶¨ÒåÒ»¸öÃûÎªsearchbynameµÄº¯Êı£¬ÓÃÀ´°´ĞÕÃû²éÕÒÑ§ÉúĞÅÏ¢
 {
 	int mark = 0;											// ¶¨ÒåÒ»¸öÕûĞÍ±äÁ¿mark£¬ÓÃÀ´±ê¼ÇÊÇ·ñ²éÕÒµ½ÁË·ûºÏÌõ¼şµÄÑ§ÉúĞÅÏ¢
 	int i;													// ¶¨ÒåÒ»¸öÕûĞÍ±äÁ¿i£¬ÓÃÀ´±éÀúËùÓĞÑ§ÉúĞÅÏ¢
@@ -129,8 +230,8 @@ int searchbyname()											// ¶¨ÒåÒ»¸öÃûÎªsearchbynameµÄº¯Êı£¬ÓÃÀ´°´ĞÕÃû²éÕÒÑ§
 			printf("\t\t\t************* ÒÔÏÂÊÇÄú²éÕÒµÄÓÃ»§ĞÅÏ¢ ***********\n");
 			printf("\t\t\tĞÕÃû: %s\n", student[i].name);
 			printf("\t\t\tµç»°: %s\n", student[i].phone);
-			printf("\t\t\tµØÖ·: %s\n", student[i].adress);
-			printf("\t\t\te-mail:%s\n", student[i].e_mail);
+			printf("\t\t\tµØÖ·: %s\n", student[i].address);
+			printf("\t\t\te-mail:%s\n", student[i].email);
 			printf("\t\t\t************************************************\n");
 			mark++;											//Ñ§ÉúĞÅÏ¢+1
 			if ((i + 1) < num)								// Èç¹ûÕÒµ½µÄÑ§ÉúĞÅÏ¢²»ÊÇ×îºóÒ»Ìõ£¬ÔòÑ¯ÎÊÓÃ»§ÊÇ·ñ¼ÌĞø²éÕÒ
@@ -162,7 +263,7 @@ int searchbyname()											// ¶¨ÒåÒ»¸öÃûÎªsearchbynameµÄº¯Êı£¬ÓÃÀ´°´ĞÕÃû²éÕÒÑ§
 }
 
 
-int searchbyphone()											//¶¨ÒåÒ»¸öÃûÎªsearchbyphoneµÄº¯Êı£¬ÓÃÀ´°´µç»°ºÅÂë²éÕÒÑ§ÉúĞÅÏ¢
+int searchContactByPhone()											//¶¨ÒåÒ»¸öÃûÎªsearchbyphoneµÄº¯Êı£¬ÓÃÀ´°´µç»°ºÅÂë²éÕÒÑ§ÉúĞÅÏ¢
 {
 	int mark = 0;											// ¶¨ÒåÒ»¸öÕûĞÍ±äÁ¿mark£¬ÓÃÀ´±ê¼ÇÊÇ·ñ²éÕÒµ½ÁË·ûºÏÌõ¼şµÄÑ§ÉúĞÅÏ¢
 	int i;													// ¶¨ÒåÒ»¸öÕûĞÍ±äÁ¿i£¬ÓÃÀ´±éÀúËùÓĞÑ§ÉúĞÅÏ¢
@@ -177,8 +278,8 @@ int searchbyphone()											//¶¨ÒåÒ»¸öÃûÎªsearchbyphoneµÄº¯Êı£¬ÓÃÀ´°´µç»°ºÅÂë²
 			printf("\t\t\t************** ÒÔÏÂÊÇÄú²éÕÒµÄÓÃ»§ĞÅÏ¢ **********\n");
 			printf("\t\t\tĞÕÃû: %s\n", student[i].name);
 			printf("\t\t\tµç»°: %s\n", student[i].phone);
-			printf("\t\t\tµØÖ·: %s\n", student[i].adress);
-			printf("\t\t\te-mail:%s\n", student[i].e_mail);
+			printf("\t\t\tµØÖ·: %s\n", student[i].address);
+			printf("\t\t\te-mail:%s\n", student[i].email);
 			printf("\t\t\t************************************************\n");
 			printf("\t\t\t°´ÈÎÒâ¼ü·µ»ØÖ÷²Ëµ¥\n");
 			mark++;											//Ñ§ÉúĞÅÏ¢+1
@@ -220,8 +321,8 @@ void deletebyphone()												//¶¨ÒåÁËÒ»¸öÃûÎªdeletebyphoneµÄº¯Êı£¬ÓÃÓÚ¸ù¾İÓÃ»
 			printf("\t\t\tÒÔÏÂÊÇÄúÒªÉ¾³ıµÄÓÃ»§¼ÍÂ¼:\n");
 			printf("\t\t\tĞÕÃû: %s\n", student[i].name);
 			printf("\t\t\tµç»°: %s\n", student[i].phone);
-			printf("\t\t\tµØÖ·: %s\n", student[i].adress);
-			printf("\t\t\te-mail:%s\n", student[i].e_mail);
+			printf("\t\t\tµØÖ·: %s\n", student[i].address);
+			printf("\t\t\te-mail:%s\n", student[i].email);
 			printf("\t\t\tÊÇ·ñÉ¾³ı?(y/n)");
 			if (_getch() == 'y' || _getch() == 'Y')					// ÈôÓÃ»§Ñ¡ÔñÉ¾³ı£¬Ôò½«¸ÃÑ§ÉúĞÅÏ¢´Ó¼ÇÂ¼Êı×éÖĞÉ¾³ı
 			{
@@ -252,102 +353,16 @@ void deletebyphone()												//¶¨ÒåÁËÒ»¸öÃûÎªdeletebyphoneµÄº¯Êı£¬ÓÃÓÚ¸ù¾İÓÃ»
 }
 
 
-void deletebyname()
-{
-	int a = 0;											// ¶¨ÒåÆğÊ¼Î»ÖÃ
-	int findmark = 0;									// ¶¨Òå²éÕÒ³É¹¦±ê¼Ç
-	int j;												// ¶¨ÒåÑ­»·¼ÆÊıÆ÷j
-	int deletemark = 0;									// ¶¨ÒåÉ¾³ı³É¹¦±ê¼Ç
-	int i;												// ¶¨ÒåÑ­»·¼ÆÊıÆ÷i
-	char name[20];										// ¶¨ÒåĞÕÃû±äÁ¿name
-	printf("\t\t\tÇëÊäÈëÒªÉ¾³ıÓÃ»§ĞÕÃû:\n");
-	scanf("%s", name);									// ½ÓÊÕÓÃ»§ÊäÈëµÄĞÕÃû
-	for (i = a; i < num; i++)							// ±éÀúËùÓĞÑ§ÉúĞÅÏ¢
-	{
-		if (strcmp(student[i].name, name) == 0)			// ÕÒµ½¶ÔÓ¦ĞÕÃûµÄÑ§ÉúĞÅÏ¢
-		{
-			printf("\t\t\tÒÔÏÂÊÇÄúÒªÉ¾³ıµÄÓÃ»§¼ÍÂ¼:");	// Êä³ö¸ÃÑ§ÉúĞÅÏ¢
-			findmark++;// ²éÕÒ³É¹¦±ê¼Ç¼Ó1
-			printf("\t\t\t________________________________");
-			printf("\t\t\tĞÕÃû: %s", student[i].name);
-			printf("\t\t\tµç»°: %s", student[i].phone);
-			printf("\t\t\tµØÖ·: %s", student[i].adress);
-			printf("\t\t\te-mail:%s", student[i].e_mail);
-			printf("\t\t\t________________________________");
-			printf("\t\t\tÊÇ·ñÉ¾³ı?(y/n)");
-			if (_getch() == 'y' || _getch() == 'Y')		// ÈôÓÃ»§Ñ¡ÔñÉ¾³ı£¬Ôò½«¸ÃÑ§ÉúĞÅÏ¢´Ó¼ÇÂ¼Êı×éÖĞÉ¾³ı
-			{
-				for (j = i; j < num - 1; j++)			//±éÀúÑ§ÉúĞÅÏ¢£¬ÕÒµ½ºóÉ¾³ı
-					student[j] = student[j + 1];
-				num--;									// Ñ§ÉúĞÅÏ¢ÊıÁ¿¼õ1
-				deletemark++;							// É¾³ı±ê¼Ç±äÁ¿¼Ó1
-				printf("\t\t\tÉ¾³ı³É¹¦");
-				if ((i + 1) < num)						// ÅĞ¶ÏÊÇ·ñ´æÔÚÏàÍ¬ĞÕÃûµÄÑ§ÉúĞÅÏ¢
-				{
-					printf("\t\t\tÊÇ·ñ¼ÌĞøÉ¾³ıÏàÍ¬ĞÕÃûµÄÓÃ»§ĞÅÏ¢?(y/n)");
-					if (_getch() == 'y')				// Èô´æÔÚ£¬Ôò¼ÌĞøÉ¾³ı
-					{
-						a = i;							// ¸üĞÂÆğÊ¼Î»ÖÃ
-						continue;						// ¼ÌĞø±éÀú
-					}
-				}
-				printf("\t\t\tÊÇ·ñ¼ÌĞøÉ¾³ı?(y/n)");
-				if (_getch() == 'y')					// Èç¹ûÓÃ»§Ñ¡Ôñ¼ÌĞø£¬Ôòµİ¹éµ÷ÓÃdeletebynameº¯ÊıÖ´ĞĞÉ¾³ı²Ù×÷
-					deletebyname();
-				return;
-			}
-			if ((i + 1) < num)							// Èç¹ûÀëÑ§ÉúĞÅÏ¢ÊıÁ¿»¹ÓĞ¶à¸öĞÅÏ¢£¬Ôò¼ÌĞøÑ¯ÎÊÊÇ·ñÉ¾³ıÏàÍ¬ĞÕÃûµÄÑ§ÉúĞÅÏ¢
-			{
-				printf("\t\t\tÊÇ·ñ¼ÌĞøÉ¾³ıÏàÍ¬ĞÕÃûµÄÓÃ»§ĞÅÏ¢?(y/n)");
-				if (_getch() == 'y' || _getch() == 'Y')	// ÈôÓÃ»§Ñ¡Ôñ¼ÌĞøÉ¾³ı£¬Ôò¼ÌĞø±éÀúÏàÍ¬ĞÕÃûµÄÑ§ÉúĞÅÏ¢
-				{
-					a = i;								// ¸üĞÂÆğÊ¼Î»ÖÃ
-					continue;							// ¼ÌĞø±éÀúÏàÍ¬ĞÕÃûµÄÑ§ÉúĞÅÏ¢
-				}
-			}
-		}
-		else
-			continue;									// ¼ÌĞø±éÀúÆäËûÑ§ÉúĞÅÏ¢
-	}
-	if ((deletemark == 0) && (findmark == 0))			//Èç¹ûÎŞ·¨ÕÒµ½¶ÔÓ¦µÄÑ§ÉúĞÅÏ¢£¬ÔòÊä³öÌáÊ¾ĞÅÏ¢²¢·µ»ØÉÏÒ»¼¶º¯Êı
-	{
-		printf("\t\t\tÃ»ÓĞ¸ÃÓÃ»§µÄ¼ÍÂ¼");
-		printf("\t\t\tÊÇ·ñ¼ÌĞøÉ¾³ı?(y/n)");
-		if (_getch() == 'y' || _getch() == 'Y')
-			deletebyphone();
-		return;
-	}
-	else if (findmark != 0)								//Èç¹ûÕÒµ½ÁËÏàÍ¬ĞÕÃûµÄÑ§ÉúĞÅÏ¢£¬µ«Ã»ÓĞÉ¾³ı³É¹¦£¬ÔòÊä³öÌáÊ¾ĞÅÏ¢²¢·µ»ØÉÏÒ»¼¶º¯Êı
-	{
-		printf("\t\t\tÃ»ÓĞÖØÃûĞÅÏ¢");
-		printf("\t\t\tÃ»ÓĞ¸ÃÓÃ»§µÄ¼ÍÂ¼");
-		printf("\t\t\tÊÇ·ñ¼ÌĞøÉ¾³ı?(y/n)");
-		if (_getch() == 'y' || _getch() == 'Y')			// Èç¹ûÓÃ»§Ñ¡Ôñ¼ÌĞøÉ¾³ı£¬Ôòµİ¹éµ÷ÓÃdeletebyphoneº¯Êı
-			deletebyphone();
-		return;
-	}
-}
 
 
-int dele()									//ÕâÊÇÒ»¸öÃûÎªdeleµÄº¯Êı£¬ÓÃÓÚ´ÓÍ¨Ñ¶Â¼ÖĞÉ¾³ıÁªÏµÈËµÄĞÅÏ¢¡£
-{
-	char choic;								//Êä³ö²Ëµ¥£¬¹©ÓÃ»§Ñ¡ÔñÉ¾³ı·½Ê½
-	printf("\t\t\t1-°´µç»°ºÅÂëÉ¾³ı 2-°´ĞÕÃûÉ¾³ı");
-	printf("\t\t\tÇëÑ¡Ôñ:");
-	choic = _getch();						// »ñÈ¡ÓÃ»§¼üÅÌÊäÈëµÄÑ¡Ôñ
-	switch (choic)							// ÅĞ¶ÏÓÃ»§µÄÑ¡Ôñ
-	{
-	case '1':deletebyphone(); break;		// Èç¹ûÓÃ»§Ñ¡Ôñ°´µç»°ºÅÂëÉ¾³ı£¬Ôòµ÷ÓÃ deletebyphone() º¯Êı
-	case '2':deletebyname(); break;			// Èç¹ûÓÃ»§Ñ¡Ôñ°´ĞÕÃûÉ¾³ı£¬Ôòµ÷ÓÃ deletebyname() º¯Êı
-	}
-	return(0);								// ·µ»Ø0£¬±íÊ¾É¾³ı³É¹¦
-}
 
 
-int sortbyname()															//ÕâÊÇÒ»¸öÃûÎªsortbynameµÄº¯Êı£¬ÓÃÓÚ½«Í¨Ñ¶Â¼ÖĞµÄÑ§Éú¼ÇÂ¼°´ÕÕĞÕÃûµÄ×ÖµäĞò½øĞĞÉıĞòÅÅĞò¡£
+
+
+int sortContactByName()															//ÕâÊÇÒ»¸öÃûÎªsortbynameµÄº¯Êı£¬ÓÃÓÚ½«Í¨Ñ¶Â¼ÖĞµÄÑ§Éú¼ÇÂ¼°´ÕÕĞÕÃûµÄ×ÖµäĞò½øĞĞÉıĞòÅÅĞò¡£
 {
 	int i, j;
-	struct record tmp;
+	struct ContactRecord tmp;
 	for (i = 1; i < num; i++)												// Ã°ÅİÅÅĞòËã·¨£¬°´ÕÕĞÕÃûÉıĞòÅÅĞò
 	{
 		if (strcmp(student[i].name, student[i - 1].name) < 0)				// ¶ÔÓÚÃ¿¸öi£¬ÅĞ¶Ïµ±Ç°Ñ§ÉúĞÕÃûÊÇ·ñ±ÈÇ°Ò»¸öÑ§ÉúĞÕÃûĞ¡£¬¼´ÅĞ¶ÏÊÇ·ñĞèÒª½»»»ÆäÎ»ÖÃ
@@ -364,7 +379,7 @@ int sortbyname()															//ÕâÊÇÒ»¸öÃûÎªsortbynameµÄº¯Êı£¬ÓÃÓÚ½«Í¨Ñ¶Â¼ÖĞµÄÑ
 	}
 	printf("\t\t\tÅÅĞò³É¹¦,ÊÇ·ñÏÔÊ¾?(y/n)");								// Êä³öÅÅĞò½á¹û£¬²¢Ñ¯ÎÊÓÃ»§ÊÇ·ñÒªÏÔÊ¾ÅÅĞòºóµÄ½á¹û
 	if (_getch() == 'y')													// Èç¹ûÓÃ»§Ñ¡ÔñÏÔÊ¾ÅÅĞò½á¹û£¬Ôòµ÷ÓÃ list() º¯Êı£¬Êä³öÍ¨Ñ¶Â¼ÖĞËùÓĞÑ§ÉúµÄ¼ÇÂ¼
-		list();
+		listContacts();
 	return(0);																// ·µ»Ø0£¬±íÊ¾ÅÅĞòÍê³É
 }
 
@@ -478,7 +493,6 @@ int writeContacts(ContactRecord contacts[], int* num_contacts)
 			break;
 		}
 
-		printf("ÁªÏµÈËÒÑÌí¼Ó¡£ÊÇ·ñ¼ÌĞøÌí¼Ó£¿(y/n): ");
 		fgets(input, MAX_INPUT, stdin);
 		if (input[0] != 'y' && input[0] != 'Y') break;
 	}
@@ -487,6 +501,8 @@ int writeContacts(ContactRecord contacts[], int* num_contacts)
 	printf("³É¹¦Ğ´Èë %d ¸öĞÂÁªÏµÈËµ½ÎÄ¼ş¡£\n", new_contacts);
 	return 0;
 }
+
+
 
 
 
